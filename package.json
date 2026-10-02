@@ -1,0 +1,10 @@
+{
+  "name": "wishwash",
+  "private": true,
+  "workspaces": ["apps/web"],
+  "scripts": {
+    "dev": "npm run dev --workspace @wishwash/web",
+    "build": "npm run build --workspace @wishwash/web",
+    "lint": "npm run lint --workspace @wishwash/web"
+  }
+}
