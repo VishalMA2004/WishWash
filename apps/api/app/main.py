@@ -14,9 +14,9 @@ app = FastAPI(
     title="WishWash API",
     description="Weather-aware laundry planning API.",
     version="0.1.0",
-    docs_url="/swagger",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json",
+    docs_url="/api/swagger",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
 )
 app.add_middleware(
     CORSMiddleware,

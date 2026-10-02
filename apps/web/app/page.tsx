@@ -8,7 +8,7 @@ type Day = { date: string; label: string; high: number; low: number; rain_probab
 type Forecast = { location: string; updated_at: string; current: { temperature: number; feels_like: number; humidity: number; wind_speed: number; rain_probability: number; condition: string }; days: Day[] };
 type Plan = { category: string; date: string; time: string; estimated_hours: number };
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
 const categoryOptions = ["Daily clothes", "Office clothes", "College clothes", "School uniforms", "Towels", "Bedsheets", "Sports clothes", "Custom"];
 const dayOfWeek = (value: string) => new Intl.DateTimeFormat("en", { weekday: "short" }).format(new Date(`${value}T12:00:00`));
 const shortDate = (value: string) => new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(new Date(`${value}T12:00:00`));
