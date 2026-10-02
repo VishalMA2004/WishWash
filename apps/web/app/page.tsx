@@ -8,7 +8,7 @@ type Day = { date: string; label: string; high: number; low: number; rain_probab
 type Forecast = { location: string; updated_at: string; current: { temperature: number; feels_like: number; humidity: number; wind_speed: number; rain_probability: number; condition: string }; days: Day[] };
 type Plan = { category: string; date: string; time: string; estimated_hours: number };
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
+const API = process.env.NEXT_PUBLIC_API_URL ?? (process.env.NODE_ENV === "development" ? "http://localhost:8000/api/v1" : "/api/v1");
 const categoryOptions = ["Daily clothes", "Office clothes", "College clothes", "School uniforms", "Towels", "Bedsheets", "Sports clothes", "Custom"];
 const dayOfWeek = (value: string) => new Intl.DateTimeFormat("en", { weekday: "short" }).format(new Date(`${value}T12:00:00`));
 const shortDate = (value: string) => new Intl.DateTimeFormat("en", { day: "numeric", month: "short" }).format(new Date(`${value}T12:00:00`));
@@ -53,22 +53,22 @@ export default function Home() {
     finally { setCheckingPlan(false); }
   };
   const startSession = () => { setPlan({ category, date, time, estimated_hours: planCheck?.drying_hours ?? plannedDay?.drying_hours ?? 4 }); setActive(true); setPlannerOpen(false); setNotification("Laundry session started in this preview. Sessions are not saved after closing the page."); window.setTimeout(() => setNotification(""), 4000); };
-  const nav = [{ icon: Sun, label: "Dashboard", active: true }, { icon: Sparkles, label: "Recommendations" }, { icon: Shirt, label: "Laundry" }, { icon: CalendarDays, label: "Calendar" }, { icon: ArrowDownRight, label: "History" }];
+  const nav = [{ icon: Sun, label: "Dashboard", href: "/", active: true }, { icon: Sparkles, label: "Recommendations", href: "/recommendations" }, { icon: Shirt, label: "Laundry", href: "/laundry" }, { icon: CalendarDays, label: "Calendar", href: "/calendar" }, { icon: ArrowDownRight, label: "History", href: "/history" }];
   const forecastStatus = (status: Day["status"]) => status === "WASH" ? ["EXCELLENT", ""] : status === "CAUTION" ? ["CAUTION", "caution"] : ["AVOID", "avoid"];
 
   return <div className="app-shell">
     <aside className="sidebar">
       <Brand />
       <div className="nav-label">WORKSPACE</div>
-      <nav className="nav-list" aria-label="Main navigation">{nav.map(({ icon: Icon, label, active: current }) => <a key={label} href="#" className={`nav-item${current ? " active" : ""}`} aria-current={current ? "page" : undefined}><Icon className="nav-icon" strokeWidth={1.8} />{label}</a>)}</nav>
+      <nav className="nav-list" aria-label="Main navigation">{nav.map(({ icon: Icon, label, href, active: current }) => <a key={label} href={href} className={`nav-item${current ? " active" : ""}`} aria-current={current ? "page" : undefined}><Icon className="nav-icon" strokeWidth={1.8} />{label}</a>)}</nav>
       <div className="nav-label" style={{ marginTop: 28 }}>PREFERENCES</div>
-      <nav className="nav-list"><a href="#" className="nav-item"><Bell className="nav-icon" strokeWidth={1.8} />Notifications</a><a href="#" className="nav-item"><Menu className="nav-icon" strokeWidth={1.8} />Settings</a></nav>
+      <nav className="nav-list"><a href="/notifications" className="nav-item"><Bell className="nav-icon" strokeWidth={1.8} />Notifications</a><a href="/settings" className="nav-item"><Menu className="nav-icon" strokeWidth={1.8} />Settings</a></nav>
       <div className="sidebar-bottom"><div className="location-card"><div className="location-top"><MapPin size={15} color="#527c63" />{forecast?.location ?? "Bengaluru"}</div><div className="location-small">Sample location for this preview</div></div><div className="profile"><div className="avatar">G</div><div><div className="profile-name">Guest</div><div className="profile-caption">Local preview</div></div></div></div>
     </aside>
     <header className="mobile-header"><Brand /><div className="mobile-header-actions"><button className="icon-button" aria-label="Notifications"><Bell size={17} /></button><button className="icon-button" aria-label="Open menu" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}><Menu size={18} /></button></div></header>
-    {isMobileMenuOpen && <div className="mobile-menu">{nav.map(({ icon: Icon, label }) => <a key={label} href="#" className="nav-item"><Icon className="nav-icon" />{label}</a>)}</div>}
+    {isMobileMenuOpen && <div className="mobile-menu">{nav.map(({ icon: Icon, label, href }) => <a key={label} href={href} className="nav-item"><Icon className="nav-icon" />{label}</a>)}<a href="/notifications" className="nav-item"><Bell className="nav-icon"/>Notifications</a><a href="/settings" className="nav-item"><Menu className="nav-icon"/>Settings</a></div>}
     <main className="main">
-      <div className="topbar"><div className="greeting"><h1>Good morning <span aria-hidden="true">☀️</span></h1><p>Here’s your laundry forecast for today.</p></div><div className="top-actions"><div className="today-pill"><CalendarDays size={14} />{new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "short" }).format(new Date())}</div><button className="icon-button" aria-label="Notifications"><Bell size={17} /></button></div></div>
+      <div className="topbar"><div className="greeting"><h1>Good morning <span aria-hidden="true">☀️</span></h1><p>Here’s your laundry forecast for today.</p></div><div className="top-actions"><div className="today-pill"><CalendarDays size={14} />{new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "short" }).format(new Date())}</div><a className="icon-button" href="/notifications" aria-label="Notifications"><Bell size={17} /></a></div></div>
       {loadError && <div className="weather-error" role="status">Weather information is temporarily unavailable. Check that the WishWash weather service is running, then refresh.</div>}
       <div className="dashboard-grid">
         <div className="left-stack">
@@ -87,7 +87,7 @@ export default function Home() {
       {notification && <div className="toast" role="status">{notification}<button aria-label="Dismiss" onClick={() => setNotification("")}><X size={14}/></button></div>}
       <InstallPrompt />
     </main>
-    <nav className="mobile-bottom" aria-label="Mobile navigation"><a href="#" className="bottom-item active"><Sun/><span>Home</span></a><a href="#forecast" className="bottom-item"><Sparkles/><span>Plan</span></a><a href="#" className="bottom-item"><CalendarDays/><span>Calendar</span></a><a href="#" className="bottom-item"><ArrowDownRight/><span>History</span></a></nav>
+    <nav className="mobile-bottom" aria-label="Mobile navigation"><a href="/" className="bottom-item active"><Sun/><span>Home</span></a><a href="/laundry" className="bottom-item"><Sparkles/><span>Plan</span></a><a href="/calendar" className="bottom-item"><CalendarDays/><span>Calendar</span></a><a href="/history" className="bottom-item"><ArrowDownRight/><span>History</span></a></nav>
     {plannerOpen && <div className="modal-backdrop" role="presentation" onClick={(e) => { if (e.target === e.currentTarget) setPlannerOpen(false); }}><section className="planner-modal" role="dialog" aria-modal="true" aria-labelledby="planner-title"><div className="modal-heading"><div><span className="eyebrow">LAUNDRY PLANNER</span><h2 id="planner-title">Plan a wash</h2></div><button className="icon-button" aria-label="Close" onClick={() => setPlannerOpen(false)}><X size={18}/></button></div><label>Laundry type<select value={category} onChange={(e) => { setCategory(e.target.value); setPlanCheck(null); }}>{categoryOptions.map((option) => <option key={option}>{option}</option>)}</select></label><div className="form-row"><label>Date<input type="date" value={date} onChange={(e) => { setDate(e.target.value); setPlanCheck(null); }}/></label><label>Start time<input type="time" value={time} onChange={(e) => { setTime(e.target.value); setPlanCheck(null); }}/></label></div><button className="check-weather-button" disabled={checkingPlan} onClick={checkPlan}>{checkingPlan ? "Checking forecast…" : "Check weather"}<CloudSun size={14}/></button>{planCheck && <div className={`plan-advice ${planCheck.status.toLowerCase()}`}><div className="plan-advice-title">{planCheck.status === "WASH" ? "Good drying window" : planCheck.status === "CAUTION" ? "Weather caution" : "Rain may interrupt drying"}</div><div>{planCheck.reasons.join(" · ")} Drying estimate: {planCheck.drying_hours} hours. Rain risk during drying: {planCheck.drying_window_rain_probability}%.</div></div>}{planCheckError && <div className="plan-check-error" role="status">{planCheckError}</div>}<div className="modal-actions"><button className="quiet-button" onClick={() => setPlannerOpen(false)}>Cancel</button><button className="primary-button" onClick={startSession}>Start laundry <ArrowRight size={14}/></button></div><p className="modal-note">You can still start laundry on a caution day or when a forecast is unavailable.</p></section></div>}
   </div>;
 }
