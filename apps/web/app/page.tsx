@@ -53,7 +53,7 @@ export default function Home() {
     finally { setCheckingPlan(false); }
   };
   const startSession = () => { setPlan({ category, date, time, estimated_hours: planCheck?.drying_hours ?? plannedDay?.drying_hours ?? 4 }); setActive(true); setPlannerOpen(false); setNotification("Laundry session started in this preview. Sessions are not saved after closing the page."); window.setTimeout(() => setNotification(""), 4000); };
-  const nav = [{ icon: Sun, label: "Dashboard", href: "/", active: true }, { icon: Sparkles, label: "Recommendations", href: "/recommendations" }, { icon: Shirt, label: "Laundry", href: "/laundry" }, { icon: CalendarDays, label: "Calendar", href: "/calendar" }, { icon: ArrowDownRight, label: "History", href: "/history" }];
+  const nav = [{ icon: Sun, label: "Dashboard", href: "/", active: true }, { icon: Sparkles, label: "Recommendations", href: "/recommendations" }, { icon: Shirt, label: "Laundry", href: "/laundry" }, { icon: Shirt, label: "Active laundry", href: "/active-laundry" }, { icon: CalendarDays, label: "Calendar", href: "/calendar" }, { icon: ArrowDownRight, label: "History", href: "/history" }, { icon: Shirt, label: "Inventory", href: "/inventory" }];
   const forecastStatus = (status: Day["status"]) => status === "WASH" ? ["EXCELLENT", ""] : status === "CAUTION" ? ["CAUTION", "caution"] : ["AVOID", "avoid"];
 
   return <div className="app-shell">
@@ -62,7 +62,7 @@ export default function Home() {
       <div className="nav-label">WORKSPACE</div>
       <nav className="nav-list" aria-label="Main navigation">{nav.map(({ icon: Icon, label, href, active: current }) => <a key={label} href={href} className={`nav-item${current ? " active" : ""}`} aria-current={current ? "page" : undefined}><Icon className="nav-icon" strokeWidth={1.8} />{label}</a>)}</nav>
       <div className="nav-label" style={{ marginTop: 28 }}>PREFERENCES</div>
-      <nav className="nav-list"><a href="/notifications" className="nav-item"><Bell className="nav-icon" strokeWidth={1.8} />Notifications</a><a href="/settings" className="nav-item"><Menu className="nav-icon" strokeWidth={1.8} />Settings</a></nav>
+      <nav className="nav-list"><a href="/notifications" className="nav-item"><Bell className="nav-icon" strokeWidth={1.8} />Notifications</a><a href="/settings" className="nav-item"><Menu className="nav-icon" strokeWidth={1.8} />Settings</a><a href="/profile" className="nav-item"><Sun className="nav-icon" strokeWidth={1.8} />Profile</a><a href="/household" className="nav-item"><Menu className="nav-icon" strokeWidth={1.8} />Household</a></nav>
       <div className="sidebar-bottom"><div className="location-card"><div className="location-top"><MapPin size={15} color="#527c63" />{forecast?.location ?? "Bengaluru"}</div><div className="location-small">Sample location for this preview</div></div><div className="profile"><div className="avatar">G</div><div><div className="profile-name">Guest</div><div className="profile-caption">Local preview</div></div></div></div>
     </aside>
     <header className="mobile-header"><Brand /><div className="mobile-header-actions"><button className="icon-button" aria-label="Notifications"><Bell size={17} /></button><button className="icon-button" aria-label="Open menu" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}><Menu size={18} /></button></div></header>

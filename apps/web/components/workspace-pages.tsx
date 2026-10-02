@@ -11,17 +11,22 @@ const navigation = [
   { href: "/", label: "Dashboard", icon: Sun },
   { href: "/recommendations", label: "Recommendations", icon: Sparkles },
   { href: "/laundry", label: "Laundry", icon: Shirt },
+  { href: "/active-laundry", label: "Active laundry", icon: Shirt },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/history", label: "History", icon: ArrowDownRight },
+  { href: "/inventory", label: "Inventory", icon: Shirt },
   { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/settings", label: "Settings", icon: Menu },
+  { href: "/profile", label: "Profile", icon: Sun },
+  { href: "/household", label: "Household", icon: Menu },
 ];
 
 export function WorkspacePage({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isActive = (href: string) => pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
   return <div className="app-shell">
-    <aside className="sidebar"><Brand /><div className="nav-label">WORKSPACE</div><nav className="nav-list" aria-label="Main navigation">{navigation.slice(0, 5).map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-item${pathname === href ? " active" : ""}`} aria-current={pathname === href ? "page" : undefined}><Icon className="nav-icon" strokeWidth={1.8} />{label}</Link>)}</nav><div className="nav-label" style={{ marginTop: 28 }}>PREFERENCES</div><nav className="nav-list" aria-label="Preferences">{navigation.slice(5).map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-item${pathname === href ? " active" : ""}`} aria-current={pathname === href ? "page" : undefined}><Icon className="nav-icon" strokeWidth={1.8} />{label}</Link>)}</nav><div className="sidebar-bottom"><div className="location-card"><div className="location-top">Bengaluru</div><div className="location-small">Weather location</div></div><div className="profile"><div className="avatar">G</div><div><div className="profile-name">Guest</div><div className="profile-caption">Local preview</div></div></div></div></aside>
+    <aside className="sidebar"><Brand /><div className="nav-label">WORKSPACE</div><nav className="nav-list" aria-label="Main navigation">{navigation.slice(0, 7).map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-item${isActive(href) ? " active" : ""}`} aria-current={isActive(href) ? "page" : undefined}><Icon className="nav-icon" strokeWidth={1.8} />{label}</Link>)}</nav><div className="nav-label" style={{ marginTop: 20 }}>PREFERENCES</div><nav className="nav-list" aria-label="Preferences">{navigation.slice(7).map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`nav-item${isActive(href) ? " active" : ""}`} aria-current={isActive(href) ? "page" : undefined}><Icon className="nav-icon" strokeWidth={1.8} />{label}</Link>)}</nav><div className="sidebar-bottom"><div className="location-card"><div className="location-top">Bengaluru</div><div className="location-small">Weather location</div></div><Link href="/profile" className="profile"><div className="avatar">G</div><div><div className="profile-name">Guest</div><div className="profile-caption">Profile & account</div></div></Link></div></aside>
     <header className="mobile-header"><Brand /><div className="mobile-header-actions"><Link className="icon-button" href="/notifications" aria-label="Notifications"><Bell size={17} /></Link><button className="icon-button" aria-label="Open menu" onClick={() => setMenuOpen(!menuOpen)}><Menu size={18} /></button></div></header>
     {menuOpen && <nav className="mobile-menu" aria-label="Mobile navigation">{navigation.map(({ href, label, icon: Icon }) => <Link key={href} href={href} onClick={() => setMenuOpen(false)} className={`nav-item${pathname === href ? " active" : ""}`}><Icon className="nav-icon" />{label}</Link>)}</nav>}
     <main className="main"><div className="topbar"><div className="greeting"><h1>{title}</h1><p>{subtitle}</p></div><div className="top-actions"><div className="today-pill"><CalendarDays size={14} />{new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "short" }).format(new Date())}</div><Link className="icon-button" href="/notifications" aria-label="Notifications"><Bell size={17} /></Link></div></div>{children}</main>
@@ -46,7 +51,7 @@ function useForecast() {
 
 export function RecommendationsPage() {
   const { forecast, error } = useForecast();
-  return <WorkspacePage title="Recommendations" subtitle="Choose a rain-free drying window for your next load."><Panel title="Next 7 days">{error ? <LoadMessage error={error} /> : !forecast ? <p className="page-message">Loading forecast…</p> : <div className="page-list">{forecast.days.map((day) => <article className="forecast-row" key={day.date}><div><strong>{new Date(`${day.date}T12:00:00`).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}</strong><p>{day.reasons.join(" · ")}</p></div><div className="forecast-row-meta"><span className={`status-pill ${day.status.toLowerCase()}`}>{day.status === "WASH" ? "GOOD TO WASH" : day.status}</span><span>Drying ~{day.drying_hours}h</span><Link className="text-link" href={`/laundry?date=${day.date}`}>Plan this day →</Link></div></article>)}</div>}</Panel></WorkspacePage>;
+  return <WorkspacePage title="Recommendations" subtitle="Choose a rain-free drying window for your next load."><Panel title="Next 7 days">{error ? <LoadMessage error={error} /> : !forecast ? <p className="page-message">Loading forecast…</p> : <div className="page-list">{forecast.days.map((day) => <article className="forecast-row" key={day.date}><div><Link href={`/recommendations/${day.date}`}><strong>{new Date(`${day.date}T12:00:00`).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}</strong></Link><p>{day.reasons.join(" · ")}</p></div><div className="forecast-row-meta"><span className={`status-pill ${day.status.toLowerCase()}`}>{day.status === "WASH" ? "GOOD TO WASH" : day.status}</span><span>Drying ~{day.drying_hours}h</span><Link className="text-link" href={`/laundry?date=${day.date}`}>Plan this day →</Link></div></article>)}</div>}</Panel></WorkspacePage>;
 }
 
 export function LaundryPage() {
